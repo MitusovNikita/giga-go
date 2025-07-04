@@ -1,0 +1,42 @@
+services:
+  api:
+    container_name: giga_go
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db  # Wait for the MySQL container to be ready
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+      - DB_NAME=mydb
+    networks:
+      - go-mysql-network
+        # MySQL Database
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_go_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    ports:
+      - "3306:3306"  # Exposing MySQL on default port 3306
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - go-mysql-network
+
+# Docker network to connect Go app and MySQL
+networks:
+  go-mysql-network:
+
+# Docker volume for MySQL data persistence
+volumes:
+  db_data:
